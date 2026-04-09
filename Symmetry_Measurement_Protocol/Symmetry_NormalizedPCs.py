@@ -6,6 +6,7 @@ import numpy as np
 import argparse
 import json
 import torch
+import os
 
 from Householder_transform import householder_transformation
 from ChamferDistance import chamfer_distance
@@ -23,7 +24,12 @@ path = Path(args.path)
 path_to_save = args.path_save
 file_ext = args.file_ext
 
-print(path_to_save)
+if not os.path.exists(path_to_save):
+    with open(path_to_save, 'w') as f:
+        pass
+    print("Archivo creado.", path_to_save)
+else:
+    print(path_to_save)
 
 def is_centered_x(points, tolerance=1e-3):
     centroid_x = np.mean(points[:, 0])
@@ -33,9 +39,26 @@ def center_in_x(points, centroid_x):
     points[:, 0] -= centroid_x
     return points
 
+def compute_diagonal(points):
+    xmin, ymin, zmin = points.min(axis=0)
+    xmax, ymax, zmax = points.max(axis=0)
+
+    #print(f"xmin {xmin}, ymin {ymin}, zmin {zmin}")
+    #print(f"xmin {xmax}, ymax {ymax}, zmax {zmin}")
+
+    dx = xmax - xmin
+    dy = ymax - ymin
+    dz = zmax - zmin
+
+    #print(f"dx {dx}, dy {dy}, dz {dz}")
+
+    diagonal = np.sqrt(dx**2 + dy**2 + dz**2)
+
+    return diagonal
+
 def compute_symmetry(dir_path, dest_path, file_ext):
     if file_ext == 'npy':
-        files = list(dir_path.glob("*.npy"))#[:1000]
+        files = list(dir_path.glob("*.npy"))[:1000]
 
         dictionary = compute_files(files, file_ext)
 
@@ -148,10 +171,19 @@ def compute_files(files, file_ext):
         # Compute Chamfer distance
         cd = chamfer_distance(original_points, transformed_points)
 
+        # Normalize
+        diagonal = compute_diagonal(original_points)
+
+        #print(f"diagonal {diagonal}")
+
+        normalized_cd = cd/diagonal
+
         print(f"CD result: {cd} - over {transformed_points.shape} points (before {all_original_points.shape})")
+        print(f"Normalized CD result: {normalized_cd} - over {transformed_points.shape} points (before {all_original_points.shape})")
 
         # Save results in a dictionary
-        dictionary.update({p.name: cd})
+        dictionary.update({f"{p.name} normal cd": cd,
+                           f"{p.name} normalized cd": normalized_cd})
 
         cont += 1
 

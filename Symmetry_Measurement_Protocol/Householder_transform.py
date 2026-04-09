@@ -19,3 +19,18 @@ def householder_transformation(pc):
 
     except:
         raise Exception("Error while trying to do the householder transformation.")
+
+'''
+# Argument parser
+parser = argparse.ArgumentParser(description="Compute chamfer distance")
+parser.add_argument("file", type=str, help="Path to the first point cloud")
+
+args = parser.parse_args()
+file = args.file
+
+# Load point cloud
+points = np.load(file)
+
+ht = householder_transformation(points)
+np.save("archivoreflejado.npy", ht)
+print("Done")'''

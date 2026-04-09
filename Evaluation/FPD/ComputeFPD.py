@@ -19,6 +19,13 @@ def load_pcs_from_pth(path):
     obj = torch.load(path, map_location='cpu')
     pcs = None
 
+    if isinstance(obj, dict):
+        pcs_obj = obj['ref']
+        mean = obj['mean'].float()
+        std = obj['std'].float()
+
+        pcs = pcs_obj * std + mean
+
     if isinstance(obj, torch.Tensor):
         pcs = obj
         if pcs.dim() != 3:
@@ -63,16 +70,19 @@ def compute_fpd_from_pth(gen_pth, ref_pth, g_class="airplane", dims=1808, prefer
     pcs1 = load_pcs_from_pth(gen_pth)
     pcs2 = load_pcs_from_pth(ref_pth)
     #pcs1 = normalize(pcs1)
-    b = pcs1.shape[0]
     #bs = choose_bs(b, prefer_batch)
 
     if g_class == "airplane":
         pcs1 = pcs1[:404, :, :]  # use first 404 samples for airplane
+        pcs2 = pcs2[:404, :, :]  # use first 404 samples for airplane
     elif g_class == "car":
         pcs1 = pcs1[:346, :, :]  # use first 346 samples for car
+        pcs2 = pcs2[:346, :, :]  # use first 346 samples for car
     elif g_class == "chair":
         pcs1 = pcs1[:637, :, :]  # use first 637 samples for chair
-
+        pcs2 = pcs2[:637, :, :]  # use first 637 samples for chair
+    
+    b = pcs1.shape[0]
     fpd = calculate_fpd(pointclouds1=pcs1, pointclouds2=pcs2, batch_size=prefer_batch, dims=dims, device=device)
 
     return fpd, prefer_batch, b
@@ -109,8 +119,8 @@ if __name__ == '__main__':
 
 ## SLIDE
 
-# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/generated_airplane_slide_2048.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_XCube/gen_pth/reference_airplane_xcube_2048.pth --device cpu --g_class airplane
+# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/samples_our_airplane.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/generated_airplane_slide_2048.pth --device cpu --g_class airplane
 
-# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/generated_car_slide_2048.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_XCube/gen_pth/reference_car_xcube_2048.pth --device cpu --g_class car
+# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/samples_our_car.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_XCube/gen_pth/reference_car_xcube_2048.pth --device cpu --g_class car
 
-# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/generated_chair_slide_2048.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_XCube/gen_pth/reference_chair_xcube_2048.pth --device cpu --g_class chair
+# python ComputeFPD.py --gen_pth /home/ncaytuir/data/Datasets/Resultados_SLIDE/gen_pth/samples_our_chair.pth --ref_pth /home/ncaytuir/data/Datasets/Resultados_XCube/gen_pth/reference_chair_xcube_2048.pth --device cpu --g_class chair
