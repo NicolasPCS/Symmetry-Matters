@@ -206,7 +206,11 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+Symmetry_Measurement_Protocol/Symmetry.py
 Symmetry_Measurement_Protocol/json_files
 Symmetry_Measurement_Protocol/Analysis_NormalizedPCs.ipynb
 Symmetry_Measurement_Protocol/Analysis_NormalizedPCs.bash
 *.pth
+*.pt
+*.ckpt
+*.pkl

@@ -1,12 +1,24 @@
 """
-Use shapenet_psr (Original SLIDE 3D dataset) as input path and shapenet_psr (New dataset) as output path.
+Use shapenet_psr as input path and shapenet_psr_<variant> as output path.
 
 The input and the ouput directories must have the following directory structure:
 
-shapenet_psr
+shapenet_psr_<variant>
     - 02691156
+        ...
+        test.lst
+        train.lst
+        val.lst
     - 02958343
+        ...
+        test.lst
+        train.lst
+        val.lst
     - 03001627
+        ...
+        test.lst
+        train.lst
+        val.lst
 """
 
 import numpy as np
@@ -55,13 +67,10 @@ for model_id in sorted(os.listdir(input_path)):
 
     print(f"Processing: {model_id}")
 
-    # ---------------------
     # Load file
-    # ---------------------
     data = np.load(input_npz)
 
     points = data['points']
-    #normals = data['normals']
 
     # Compute the centroid of the bounding
     bbox_min = np.min(points, axis=0)
@@ -95,6 +104,6 @@ for model_id in sorted(os.listdir(input_path)):
     output_npz = os.path.join(model_output_dir, "pointcloud.npz")
     np.savez(output_npz, points=full_points, normals=normals)
 
-print("Procesamiento completo")
-print(f"Procesados: {processed}")
-print(f"Ignorados: {skipped}")
+print("Processing completed")
+print(f"Processed: {processed}")
+print(f"Ingnored: {skipped}")

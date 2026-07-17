@@ -31,17 +31,12 @@ parser.add_argument("is_coarse", type=bool, help="Whether the voxel grid is coar
 
 args = parser.parse_args()
 
-#input_path = "/home/ncaytuir/data/Datasets/ShapeNetCore.v6.PC15k/02691156"
-#output_path = "/home/ncaytuir/data-local/XCube_necs/data/XCube_DatasetV2/128/02691156"
-
 input_path = args.input_path
 output_path = args.output_path
 is_coarse = args.is_coarse
 
 def compute_fpdb(input_xyz, input_normal, split_out):
     # Note that coarse-level voxel set to True and fine-level voxel set to False
-    #build_splatting = True
-    #build_splatting = False
     build_splatting = is_coarse
     voxel_size = 0.0025 # 0.01 for coarse-level, 0.0025 for fine-level
 
@@ -87,18 +82,16 @@ for split in splits:
     for fname in os.listdir(split_in):
         if fname.endswith(".npy"):
             npy_path = os.path.join(split_in, fname)
-            names.append(fname[:-4])  # remove .npy extension
+            names.append(fname[:-4])
 
             try:
                 # Load point cloud data
                 point_cloud = np.load(npy_path).astype(np.float32)
                 point_cloud = torch.tensor(point_cloud, dtype=torch.float32)
-                #print(point_cloud.shape)
 
                 # Compute normals
                 normals_np = compute_normals(point_cloud.numpy())
                 normals = torch.tensor(normals_np, dtype=torch.float32)
-                #print(normals.shape)
 
                 # Create FVDB grid and splat normals
                 out_file = os.path.join(split_out, fname.replace(".npy", ".pkl"))
@@ -108,10 +101,9 @@ for split in splits:
                 print(f"Error processing {npy_path}: {e}")
                 continue
 
-    # escribir .lst
+    # write .lst
     with open(lst_path, "w") as f:
         for name in names:
             f.write(f"{name}\n")
 
     print(f"Finished processing split: {split}")
-
