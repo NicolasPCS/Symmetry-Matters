@@ -1,6 +1,6 @@
 # Symmetry Matters: Auditing and Symmetrizing 3D Generative Models
 
-![Teaser](Assets/Symmetrization%20of%203D%20Generative%20Models.jpg)
+![Teaser](assets/Symmetrization%20of%203D%20Generative%20Models.jpg)
 
 > **Symmetry Matters: Auditing and Symmetrizing 3D Generative Models**<br>
 > Nicolas Caytuiro and Ivan Sipiran<br>
